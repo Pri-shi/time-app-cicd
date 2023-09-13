@@ -1,0 +1,23 @@
+{
+    "name": "digital-clock-app",
+    "version": "1.0.0",
+    "description": "A simple digital clock app",
+    "homepage": "https://pri-shi.github.io/time-app-cicd/",
+    "scripts": {
+        "build": "mkdir -p dist && cp index.html style.css script.js dist/",
+        "deploy": "gh-pages -d dist"
+    },
+    "keywords": [
+        "digital clock",
+        "web app",
+        "javascript"
+    ],
+    "author": "Priyamvada",
+    "devDependencies": {
+        "eslint": "^8.38.0",
+        "gh-pages": "^5.0.0",
+        "htmlhint": "^1.1.4",
+        "stylelint": "^15.10.3",
+        "stylelint-config-standard": "34.0.0"
+    }
+}

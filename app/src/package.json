@@ -1,6 +1,0 @@
-{
-    "main": "script.js",
-    "scripts": {
-        "start": "http-server -p 8082"
-    }
-}
