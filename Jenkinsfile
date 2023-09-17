@@ -1,7 +1,7 @@
 pipeline {
 
     agent {
-        label: "jenkins-agent-ubuntu-slave3"
+        label "jenkins-agent-ubuntu-slave3"
     }
 
     stages {
@@ -9,7 +9,7 @@ pipeline {
             steps {
                 // Check out the source code from your Git repository
                 script {
-                    git branch: 'main', credentialsId: 'bitbucket-credentials', url: 'https://pri-shi-admin@bitbucket.org/pri-shi/time-app-cicd.git'
+                    git branch: 'feature/cicd-jenkins', credentialsId: 'Pri-shi-github', url: 'https://github.com/Pri-shi/time-app-cicd.git'
                     sh"""
                     ls
                     pwd
@@ -17,49 +17,55 @@ pipeline {
                 }
             }
         }
-
-//         stage('Build ') {
-//             steps {
-//                 // Build and test your web application
-//                 script {
-//                     sh """
-//                     npm install
-//                     npm run build
-//                     echo 'export PATH=$PATH:$(npm bin -g)' >> $HOME/.bashrc
-//                     """
-//                     // Add commands for testing, e.g., HTML/CSS validation
-//                 }
-//             }
-//         }
-//          stage('Lint') {
-//             steps {
-//                 // Build and test your web application
-//                 script {
-//                     sh """
-//                     npx htmlhint index.html
-//                     npx stylelint --fix --config .stylelintrc.temp.json style.css
-//                     """
-//                     // Add commands for testing, e.g., HTML/CSS validation
-//                 }
-//             }
-//         }
-//         stage('Deploy') {
-//             when {
-//                 // Only deploy if the previous stages were successful
-//                 expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
-//                 branch "main"
-//             }
-//             steps {
-//                 // Add deployment commands here
-//                 script {
-//                     // Example: Deploy to a web server using SCP
-//                     // deploys web application to port 8080 of agent
-//                     sh """
-//                     npm deploy 
-//                     """
-//                     // Make sure Jenkins has SSH access to your server
-//                 }
-//             }
-//         }
+         stage('Lint') {
+            steps {
+                // Build and test your web application
+                nodejs(nodeJSInstallationName: 'nodejs'){
+                    sh '''
+                        cd app/src
+                        npm install
+                        npx htmlhint@1.1.4 index.html
+                        npx stylelint@15.10.3 --fix --config .stylelintrc.temp.json style.css
+                    '''
+                }
+            }
+        }
+        stage('Build ') {
+            steps {
+                // Build and test your web application
+               nodejs(nodeJSInstallationName: 'nodejs'){
+                sh '''
+                cd app/src
+                npm run build
+                '''
+               }
+            }
+        }
+        stage('Deploy') {
+            when {
+                // Only deploy if the previous stages were successful
+                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
+                branch "main"
+            }
+            steps {
+                // Add deployment commands here
+                nodejs(nodeJSInstallationName: 'nodejs'){
+                     sh """
+                    cd app/src 
+                    npm run deploy 
+                    """
+                }
+            }
+        }
+    }
+     post {
+        always {
+            archiveArtifacts artifacts: '*.log', onlyIfSuccessful: true, allowEmptyArchive: true
+            emailext to: "priyamvadajoshii1@example.com",
+            subject: "Jenkins Build: ${currentBuild.currentResult}: ${JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${JOB_NAME}",
+            attachmentsPattern: 'my-pipeline-log.log'
+            cleanWs()
+        }
     }
 }

@@ -5,7 +5,7 @@
     "description": "A simple digital clock app",
     "scripts": {
         "build": "mkdir -p dist && cp index.html style.css script.js dist/",
-        "deploy": "python3 -m http.sever 8080"
+        "deploy": "python3 -m http.server 8080 &"
     },
     "keywords": [
         "digital clock",
@@ -17,6 +17,7 @@
         "eslint": "^8.38.0",
         "htmlhint": "^1.1.4",
         "stylelint": "^15.10.3",
-        "stylelint-config-standard": "34.0.0"
+        "stylelint-config-standard": "34.0.0",
+        "http-server": "^0.12.3"
     }
 }
